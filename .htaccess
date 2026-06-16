@@ -1,0 +1,141 @@
+RewriteEngine On
+
+# ✅ REDIRECT: Redirect www1 to non-www
+RewriteCond %{HTTP_HOST} ^www1\.(.*)$ [NC]
+RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+# ✅ ABSOLUTE FIX (ASSETS):
+# Bypass ALL rewrite / redirect for assets & ensure correct MIME types
+AddType text/css .css
+AddType application/javascript .js
+AddType image/x-icon .ico
+
+RewriteCond %{REQUEST_URI} ^/(assets|images|template|favicon\.ico) [NC]
+RewriteRule .* - [L]
+
+# 🔒 ABSOLUTE FIX (SUBDOMAINS/SITEMAPS/GO):
+# Bypass ALL root rewrites for sitemaps and doorway directory
+RewriteRule ^(sitemap\.php|sitemaps/.*)$ - [L]
+RewriteRule ^go/.*$ - [L]
+
+# ✅ CLEAN URL: Remove _g tracking param (exclude sitemap/go)
+RewriteCond %{REQUEST_URI} !^/(sitemap\.php|sitemaps/|go/) [NC]
+RewriteCond %{QUERY_STRING} (^|&)_g=[^&]+
+RewriteRule ^ %{REQUEST_URI}? [R=301,L]
+
+
+# ✅ FIX: Remove syntax errors and fix URL rewriting
+RewriteCond %{REQUEST_URI} !^/payment\.php$ [NC]
+RewriteCond %{HTTP_REFERER} ^view-source: [NC]
+RewriteRule .* - [F,L]
+
+# ✅ FIX: Handle payment-php-backend endpoints
+RewriteRule ^payment-php-backend/(.*)$ payment-php-backend/$1 [L]
+
+# ✅ FIX: Bypass rewrite for test endpoints (must be BEFORE main routing)
+# Check if file exists first, then bypass if it's a test file
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteCond %{REQUEST_URI} ^/(test_proxy\.php|test_proxy_connection\.php|test_proxy_bypass\.php|test_debug\.php|test_simple\.php|test_server_config\.php|test_server_request\.php|proxy_hls\.php) [NC]
+RewriteRule .* - [L]
+
+# ✅ SEO: Author Profiles
+RewriteRule ^author/([a-z0-9\-]+)/?$ author.php?name=$1 [L,QSA]
+
+# ✅ SEO: Friendly News URLs (/news/slug-id)
+RewriteRule ^news/([a-z0-9\-]+)-([a-z0-9]+)/?$ news.php?id=$2 [L,QSA]
+
+# ✅ FIX: Handle main routing (sitemap/go already excluded above)
+# Only route to index.php if file doesn't exist and not in /go/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/go/ [NC]
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+# ✅ FIX: Handle API endpoints
+RewriteRule ^api\.php$ api.php [L]
+
+# ✅ PERFORMANCE: Optimize and Enable Compression
+<IfModule mod_deflate.c>
+    # Enable GZIP compression for text files
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/json
+    
+    # Compress SVG and fonts
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+    AddOutputFilterByType DEFLATE application/x-font-ttf
+    AddOutputFilterByType DEFLATE font/opentype
+</IfModule>
+
+# ✅ PERFORMANCE: Browser Caching (Aggressive)
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Default expiration: 1 hour
+    ExpiresDefault "access plus 1 hour"
+    
+    # Images: 1 Year
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # CSS/JS: 1 Month
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    
+    # Fonts: 1 Year
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/otf "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
+    ExpiresByType application/x-font-ttf "access plus 1 year"
+    ExpiresByType application/x-font-opentype "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+    # ✅ PERFORMANCE: Cache-Control Headers
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico|woff|woff2|ttf|eot|otf)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=2592000, stale-while-revalidate=86400"
+    </FilesMatch>
+    
+    <FilesMatch "\.(php|html)$">
+        Header set Cache-Control "public, max-age=300, stale-while-revalidate=60"
+    </FilesMatch>
+
+    # Remove ETags
+    Header unset ETag
+    FileETag None
+    
+    # Add Vary: Accept-Encoding
+    <FilesMatch "\.(js|css|xml|gz|html|txt)$">
+        Header append Vary Accept-Encoding
+    </FilesMatch>
+    
+    # Keep-Alive
+    Header set Connection keep-alive
+
+    # Security headers
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>

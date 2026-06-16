@@ -1,0 +1,115 @@
+# ✅ OPTIMIZED robots.txt untuk SEO-friendly indexing
+# Note: Crawl-delay is NOT supported by Googlebot and is ignored.
+# Only Yandex, Baidu, and other non-Google bots respect Crawl-delay.
+
+# Google Bot - Full crawling access
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /error_log
+Disallow: /*.log$
+
+# Google Image Bot
+User-agent: Googlebot-Image
+Allow: /
+Disallow: /api/
+
+# Google Video Bot
+User-agent: Googlebot-Video
+Allow: /
+Disallow: /api/
+
+# Google Mobile Bot
+User-agent: Googlebot-Mobile
+Allow: /
+Disallow: /api/
+
+# Bing Bot
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Disallow: /error_log
+Disallow: /*.log$
+
+# Bing Preview Bot
+User-agent: BingPreview
+Allow: /
+Disallow: /api/
+
+# Yandex Bot (supports Crawl-delay)
+User-agent: Yandex
+Allow: /
+Disallow: /api/
+Disallow: /error_log
+Crawl-delay: 1
+
+# Baidu Bot (supports Crawl-delay)
+User-agent: Baiduspider
+Allow: /
+Disallow: /api/
+Disallow: /error_log
+Crawl-delay: 1
+
+# DuckDuckGo Bot (supports Crawl-delay)
+User-agent: DuckDuckBot
+Allow: /
+Disallow: /api/
+Crawl-delay: 1
+
+# Facebook bots (untuk social sharing dan preview)
+User-agent: facebookexternalhit
+Allow: /
+Disallow: /api/
+
+User-agent: facebookcatalog
+Allow: /
+Disallow: /api/
+
+# Twitter bot (untuk Twitter Cards)
+User-agent: Twitterbot
+Allow: /
+Disallow: /api/
+
+# LinkedIn bot
+User-agent: LinkedInBot
+Allow: /
+Disallow: /api/
+
+# WhatsApp bot
+User-agent: WhatsApp
+Allow: /
+Disallow: /api/
+
+# Telegram bot
+User-agent: TelegramBot
+Allow: /
+Disallow: /api/
+
+# Apple Bot (untuk Apple Search)
+User-agent: Applebot
+Allow: /
+Disallow: /api/
+
+# Slurp Bot (Yahoo - supports Crawl-delay)
+User-agent: Slurp
+Allow: /
+Disallow: /api/
+Crawl-delay: 1
+
+# All other bots
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /error_log
+Disallow: /*.log$
+Disallow: /admin/
+Disallow: /private/
+Crawl-delay: 1
+
+# Sitemap locations
+Sitemap: https://maxpreps.news/go/sitemap.php
+Sitemap: https://maxpreps.news/sitemaps/sitemap_index.xml
+Sitemap: https://maxpreps.news/sitemap-news.php
+Sitemap: https://maxpreps.news/sitemap-video.php
+Sitemap: https://maxpreps.news/sitemap-articles.php
+Sitemap: https://maxpreps.news/sitemap-image.php

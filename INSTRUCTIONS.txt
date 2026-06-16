@@ -1,0 +1,386 @@
+================================================================================
+                    MAXPREPS NEWS - SETUP INSTRUCTIONS
+================================================================================
+
+This document contains complete setup instructions for MaxPreps News website.
+Follow these steps in order to get your site running properly.
+
+================================================================================
+                        TABLE OF CONTENTS
+================================================================================
+
+1. SITE CONFIGURATION (config.php)
+2. CRON JOB SETUP (Auto-Update News)
+3. ADVERTISEMENT SETUP
+4. SITEMAP SUBMISSION
+5. ADSENSE APPLICATION
+6. TESTING CHECKLIST
+
+================================================================================
+                    1. SITE CONFIGURATION (config.php)
+================================================================================
+
+Edit: /public_html/config.php
+
+### STEP 1.1: Site Identity
+---------------------------------------------------------
+Update these to match your branding:
+
+    'site_title' => 'YourSiteName',
+    'site_tagline' => 'Your Tagline Here',
+
+### STEP 1.2: Logo Text (Appears in Header)
+---------------------------------------------------------
+The logo displays as: Text1<span>Text2</span>Text3
+
+Example: High<span>School</span>News
+
+    'site_logo_text_1' => 'High',
+    'site_logo_text_2' => 'School',
+    'site_logo_text_3' => 'News',
+
+### STEP 1.3: Support Email
+---------------------------------------------------------
+Update with your actual support email:
+
+    'support_email' => 'support@yourdomain.com',
+
+This appears on:
+- Contact page
+- Footer
+- Legal pages
+
+### STEP 1.4: Advertisement Codes
+---------------------------------------------------------
+See Section 3 below for detailed ad setup instructions.
+
+================================================================================
+                    2. CRON JOB SETUP (Auto-Update News)
+================================================================================
+
+IMPORTANT: This cron job fetches and rewrites MaxPreps news automatically.
+Without it, your site won't have fresh content!
+
+### STEP 2.1: Access Cron Jobs
+---------------------------------------------------------
+1. Log into your hosting control panel (cPanel/DirectAdmin/Plesk)
+2. Find "Cron Jobs" section
+3. Click "Add New Cron Job"
+
+### STEP 2.2: Configure Cron Job
+---------------------------------------------------------
+**Command to Run**:
+    /usr/bin/php /home/u348050414/domains/maxpreps.news/public_html/cron/fetch_news.php
+
+**Schedule**: Every 1 Hour
+- Minute: 0
+- Hour: */1
+- Day: *
+- Month: *
+- Weekday: *
+
+**OR use this shorthand**:
+    0 */1 * * *
+
+### STEP 2.3: Verify Cron is Working
+---------------------------------------------------------
+After 1 hour, check:
+
+1. File exists: /public_html/data/news.json
+2. File is not empty (should have article data)
+3. Homepage shows rewritten MaxPreps articles
+
+**Troubleshooting**:
+- If news.json is empty, check cron/rewrite.txt for errors
+- Ensure PHP CLI is available: which php
+- Check file permissions: chmod 755 cron/fetch_news.php
+
+================================================================================
+                    3. ADVERTISEMENT SETUP
+================================================================================
+
+All ads are managed from ONE file: config.php
+
+### STEP 3.1: Understanding Ad Slots
+---------------------------------------------------------
+8 Available Ad Positions:
+
+UNIVERSAL (All Pages):
+  - header_top         → Above navigation bar
+  - sidebar_top        → Top of sidebar (home & news)
+  - article_middle     → Inside articles (after 3 paragraphs)
+  - footer_top         → Just above footer
+
+PLAYER PAGE:
+  - player_below       → Below video player
+  - player_chat        → Inside live chat section
+  - player_schedule    → Below schedule table
+  - player_footer      → Above footer on player page
+
+### STEP 3.2: Add Your Ad Codes
+---------------------------------------------------------
+Edit: /public_html/config.php
+
+Find the 'ads' section and paste your ad codes:
+
+**Example - AdSense**:
+    'player_below' => '
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXX"></script>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-format="auto"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    ',
+
+**Example - Adsterra**:
+    'header_top' => '
+        <script type="text/javascript">
+            atOptions = {
+                "key" : "your-key-here",
+                "format" : "iframe",
+                "height" : 90,
+                "width" : 728
+            };
+        </script>
+        <script src="https://example.com/invoke.js"></script>
+    ',
+
+**Example - Banner Image**:
+    'sidebar_top' => '<div><a href="https://offer.com"><img src="/banner.jpg" alt="Ad"></a></div>',
+
+### STEP 3.3: Supported Ad Formats
+---------------------------------------------------------
+✅ JavaScript ads (AdSense, Adsterra)
+✅ Iframe ads
+✅ HTML banners (images, divs)
+✅ Mixed content (div + script)
+✅ ANY HTML code
+
+### STEP 3.4: Enable/Disable Ads
+---------------------------------------------------------
+To DISABLE an ad: Set it to empty string
+    'player_below' => '',
+
+To ENABLE: Add your ad code
+    'player_below' => '<script>...</script>',
+
+================================================================================
+                    4. SITEMAP SUBMISSION
+================================================================================
+
+Your site has 3 specialized sitemaps for better SEO.
+
+### STEP 4.1: Available Sitemaps
+---------------------------------------------------------
+1. News Articles:        /sitemap-news.php
+2. Video/Events:         /sitemap-video.php
+3. Images:               /sitemap-image.php
+
+### STEP 4.2: Submit to Google Search Console
+---------------------------------------------------------
+1. Go to: https://search.google.com/search-console
+2. Add your property (maxpreps.news)
+3. Click "Sitemaps" in left menu
+4. Add all 3 sitemaps:
+   - https://maxpreps.news/sitemap-news.php
+   - https://maxpreps.news/sitemap-video.php
+   - https://maxpreps.news/sitemap-image.php
+5. Click "Submit"
+
+**Auto-Update**: Sitemaps update automatically via cron job!
+
+### STEP 4.3: Verify Indexing
+---------------------------------------------------------
+Check Google Search Console after 24-48 hours:
+- Coverage report should show indexed pages
+- Performance should show impressions
+
+================================================================================
+                    5. GOOGLE ADSENSE APPLICATION
+================================================================================
+
+Your site is READY for AdSense! Here's the checklist:
+
+### STEP 5.1: Pre-Application Checklist
+---------------------------------------------------------
+✅ Privacy Policy page: /privacy.php
+✅ Terms of Use page: /terms.php
+✅ DMCA Notice page: /dmca.php
+✅ Contact page: /contact.php
+✅ About page: /about.php
+✅ SearchAction schema (for Google sitelinks)
+✅ 95% unique content (auto-rewriter)
+✅ Regular updates (cron job)
+✅ Mobile responsive design
+✅ Professional appearance
+
+### STEP 5.2: Apply for AdSense
+---------------------------------------------------------
+1. Go to: https://www.google.com/adsense
+2. Sign in with Google account
+3. Add your website URL
+4. Accept terms and conditions
+5. Connect your site (add AdSense code to header)
+
+### STEP 5.3: After Approval
+---------------------------------------------------------
+1. Get your AdSense ad codes
+2. Edit config.php
+3. Replace ads with AdSense codes:
+   
+   'header_top' => 'PASTE ADSENSE CODE HERE',
+   'sidebar_top' => 'PASTE ADSENSE CODE HERE',
+   etc...
+
+4. Save and test!
+
+### STEP 5.4: AdSense Tips
+---------------------------------------------------------
+- Start with Auto Ads for best performance
+- Use responsive ad units
+- Don't place too many ads (3-4 per page max)
+- Monitor AdSense dashboard for earnings
+- Comply with AdSense policies
+
+================================================================================
+                    6. TESTING CHECKLIST
+================================================================================
+
+Before going live, verify everything works:
+
+### STEP 6.1: Core Functionality
+---------------------------------------------------------
+[ ] Homepage loads without errors
+[ ] News articles display (check /news.php)
+[ ] Video player works (check /player.php)
+[ ] Search function works (try searching)
+[ ] Mobile responsive (test on phone)
+
+### STEP 6.2: Legal Pages
+---------------------------------------------------------
+[ ] /privacy.php loads correctly
+[ ] /terms.php loads correctly
+[ ] /dmca.php loads correctly
+[ ] /contact.php loads correctly
+[ ] /about.php loads correctly
+[ ] Contact form sends emails
+
+### STEP 6.3: Auto-Update System
+---------------------------------------------------------
+[ ] Cron job is scheduled
+[ ] data/news.json file exists and has content
+[ ] Homepage shows rewritten MaxPreps articles
+[ ] Articles update hourly
+
+### STEP 6.4: SEO & Sitemaps
+---------------------------------------------------------
+[ ] All 3 sitemaps accessible
+[ ] Sitemaps submitted to Google Search Console
+[ ] Meta descriptions present on all pages
+[ ] Structured data validates (Google Rich Results Test)
+
+### STEP 6.5: Advertisements
+---------------------------------------------------------
+[ ] Ad codes added to config.php
+[ ] Ads display on homepage
+[ ] Ads display on news pages
+[ ] Ads display on player page
+[ ] No console errors from ad scripts
+
+### STEP 6.6: Performance
+---------------------------------------------------------
+[ ] Site loads in < 3 seconds
+[ ] No PHP errors in error logs
+[ ] Images load properly
+[ ] Videos play smoothly
+
+================================================================================
+                    QUICK REFERENCE
+================================================================================
+
+Important Files:
+- config.php                  → All configuration
+- cron/fetch_news.php         → Auto-update script
+- data/news.json             → Cached news data
+- sitemap-*.php              → SEO sitemaps
+
+Important URLs:
+- /                          → Homepage
+- /news.php                  → Article listing
+- /player.php                → Video player
+- /search.php                → Search page
+- /privacy.php               → Privacy Policy
+- /terms.php                 → Terms of Use
+- /dmca.php                  → DMCA Notice
+- /contact.php               → Contact form
+- /about.php                 → About page
+
+Cron Schedule:
+- fetch_news.php             → Every 1 hour
+
+Support Email:
+- Edit in config.php
+- Shows on footer, contact, legal pages
+
+================================================================================
+                    SUPPORT & TROUBLESHOOTING
+================================================================================
+
+### Common Issues:
+---------------------------------------------------------
+1. "No news showing on homepage"
+   → Check cron job is running
+   → Verify data/news.json exists and has content
+   
+2. "Ads not displaying"
+   → Check config.php has ad codes
+   → Verify no ad-blocker is active
+   → Check browser console for errors
+
+3. "Blank pages / PHP errors"
+   → Enable error display temporarily
+   → Check PHP error logs
+   → Verify all files uploaded correctly
+
+4. "Search not working"
+   → Check data/news.json exists
+   → Verify NFHS API is accessible
+
+### File Permissions:
+---------------------------------------------------------
+Directories: 755 (rwxr-xr-x)
+PHP Files: 644 (rw-r--r--)
+data/ folder: 755 (writable by cron)
+
+### Backup Recommendations:
+---------------------------------------------------------
+- config.php (contains all settings)
+- data/news.json (cached content)
+- Database (if you add one later)
+- Ad codes (keep a copy)
+
+================================================================================
+                    VERSION INFORMATION
+================================================================================
+
+MaxPreps News Platform
+Version: 2.0
+Last Updated: February 2026
+
+Features:
+- Auto-rewriting content (95% uniqueness)
+- SEO-optimized sitemaps
+- AdSense-ready design
+- Mobile responsive
+- Search functionality
+- Legal compliance pages
+- Centralized ad management
+
+================================================================================
+                        END OF INSTRUCTIONS
+================================================================================
+
+For questions or support, check the documentation in /docs/ folder.
+Happy publishing! 🚀
